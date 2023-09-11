@@ -3,7 +3,8 @@ import torch.utils.cpp_extension
 from torch_geometric.transforms import BaseTransform
 from torch_geometric.data import Data
 from torch_sparse import SparseTensor
-from torch_geometric.loader.utils import to_csc, filter_data
+from torch_geometric.loader.utils import filter_data
+from torch_geometric.sampler.utils import to_csc
 
 
 class BoundOutDegree(BaseTransform):
@@ -19,7 +20,7 @@ class BoundOutDegree(BaseTransform):
 
     def sample(self, data: Data) -> Data:
         colptr, row, perm = to_csc(data, device='cpu')
-        index = torch.arange(0, data.num_nodes-1, dtype=int)
+        index = torch.arange(0, data.num_nodes - 1, dtype=int)
         sample_fn = torch.ops.torch_sparse.neighbor_sample
         node, row, col, edge = sample_fn(
             colptr, row, index, [self.num_neighbors], self.with_replacement, True
@@ -28,11 +29,10 @@ class BoundOutDegree(BaseTransform):
         return data
 
 
-
 class BoundDegree(BaseTransform):
     def __init__(self, max_degree: int):
         self.max_deg = max_degree
-        
+
         try:
             edge_sampler = torch.ops.my_ops.sample_edge
         except (AttributeError, RuntimeError):
@@ -44,7 +44,7 @@ class BoundDegree(BaseTransform):
                 verbose=False,
             )
             edge_sampler = torch.ops.my_ops.sample_edge
-        
+
         self.edge_sampler = edge_sampler
 
     def __call__(self, data: Data) -> Data:

@@ -17,7 +17,7 @@ class WandbLogger(LoggerBase):
             raise ImportError('wandb is not installed yet, install it with `pip install wandb`.')
 
     @property
-    def experiment(self) -> Run:
+    def experiment(self):
         if not hasattr(self, '_experiment'):
             os.environ["WANDB_SILENT"] = "true"
             settings = wandb.Settings(start_method="fork")
