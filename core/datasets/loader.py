@@ -11,10 +11,13 @@ from core.data.transforms import FilterClassByCount
 from core.data.transforms import RemoveSelfLoops
 from core.data.transforms import RemoveIsolatedNodes
 from core.utils import dict2table
-from torch_geometric.datasets import Flickr, LastFMAsia
+from torch_geometric.datasets import Flickr, LastFMAsia, Twitch
 
 
 class DatasetLoader:
+    twitch_train = Twitch(root='./', name='ES')
+    twitch_test = Twitch(root='./', name='EN')
+
     supported_datasets = {
         'flickr': partial(Flickr,
                           transform=Compose([
@@ -27,7 +30,7 @@ class DatasetLoader:
                               RandomNodeSplit(num_val=0.1, num_test=0.15),
                               FilterClassByCount(min_count=100, remove_unlabeled=True)
                           ])
-                          ),
+                          )
     }
 
     def __init__(self,
