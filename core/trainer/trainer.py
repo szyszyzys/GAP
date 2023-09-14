@@ -83,7 +83,7 @@ class Trainer:
 
         if checkpoint:
             os.makedirs('checkpoints', exist_ok=True)
-            checkpoint_path = os.path.join('checkpoints', f'{prefix}_{self.model_name}_{uuid.uuid1()}.pt')
+            checkpoint_path = os.path.join('checkpoints', f'save.pt')
             torch.save(self.model.state_dict(), checkpoint_path)
 
         if val_dataloader is None:
