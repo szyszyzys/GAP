@@ -11,5 +11,7 @@ Run_attack() {
 for dataset in $datasets; do
       for eps in $epss; do
             Run_attack "$dataset" "$eps"
+            mv ./checkpoints/_* ./checkpoints/"$dataset"_eps_"$eps"_edp.pt
+            mv ./checkpoints/encoder/_* ./checkpoints/encoder/"$dataset"_eps_"$eps"_edp.pt
     done
 done
