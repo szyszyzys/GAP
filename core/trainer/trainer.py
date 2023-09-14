@@ -17,6 +17,7 @@ class Trainer:
                  monitor:       str = 'val/acc',
                  monitor_mode:  Literal['min', 'max'] = 'max',
                  val_interval:  Annotated[int, ArgInfo(help='interval of validation')] = 1,
+                 model_name = "",
                  ):
 
         assert monitor_mode in ['min', 'max']
@@ -29,6 +30,7 @@ class Trainer:
         # trainer internal state
         self.model: TrainableModule = None
         self.metrics: dict[str, MeanMetric] = {}
+        self.model_name = model_name
 
     def reset(self):
         self.model = None
@@ -81,7 +83,7 @@ class Trainer:
 
         if checkpoint:
             os.makedirs('checkpoints', exist_ok=True)
-            checkpoint_path = os.path.join('checkpoints', f'{uuid.uuid1()}.pt')
+            checkpoint_path = os.path.join('checkpoints', f'{prefix}_{self.model_name}_{uuid.uuid1()}.pt')
             torch.save(self.model.state_dict(), checkpoint_path)
 
         if val_dataloader is None:
@@ -117,7 +119,7 @@ class Trainer:
                     if best_metrics is None or self.is_better(metrics[monitor_key], best_metrics[monitor_key]):
                         best_metrics = metrics
                         num_epochs_without_improvement = 0
-
+                        # save best model
                         if checkpoint:
                             torch.save(self.model.state_dict(), checkpoint_path)
                     else:
